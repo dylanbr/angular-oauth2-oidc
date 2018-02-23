@@ -1,4 +1,4 @@
-import {OAuthStorage} from './types';
+import { OAuthStorage } from './types';
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
@@ -34,8 +34,11 @@ import { OAuthModuleConfig } from "./oauth-module.config";
 import { OAuthResourceServerErrorHandler, OAuthNoopResourceServerErrorHandler } from "./interceptors/resource-server-error-handler";
 import { DefaultOAuthInterceptor } from "./interceptors/default-oauth.interceptor";
 
-export function createDefaultStorage() { 
-  return (typeof sessionStorage !== 'undefined') ? sessionStorage : null;
+export function createDefaultStorage(config: OAuthModuleConfig) { 
+	if(!config.storage) {
+		config.storage = (typeof sessionStorage !== 'undefined') ? sessionStorage : null;
+	}
+	return config.storage;
 }
 
 @NgModule({
@@ -58,9 +61,9 @@ export class OAuthModule {
       providers: [
         OAuthService,
         UrlHelperService,
-        { provide: OAuthStorage, useFactory: createDefaultStorage  },
-        { provide: OAuthResourceServerErrorHandler, useClass: OAuthNoopResourceServerErrorHandler},
         { provide: OAuthModuleConfig, useValue: config},
+		{ provide: OAuthStorage, useFactory: createDefaultStorage, deps: [OAuthModuleConfig] },
+        { provide: OAuthResourceServerErrorHandler, useClass: OAuthNoopResourceServerErrorHandler},
         { provide: HTTP_INTERCEPTORS, useClass: DefaultOAuthInterceptor, multi: true}
       ]
 

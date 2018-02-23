@@ -1,7 +1,8 @@
-
+import { OAuthStorage } from './types';
 
 export abstract class OAuthModuleConfig {
-    resourceServer: OAuthResourceServerConfig;
+    resourceServer?: OAuthResourceServerConfig;
+	storage?: OAuthStorage;
 }
 
 export abstract class OAuthResourceServerConfig {
